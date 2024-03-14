@@ -1,6 +1,7 @@
 import os
 import datetime
 import webbrowser
+import logging
 import nltk
 import openai
 import pyttsx3
@@ -10,8 +11,6 @@ import subprocess
 import speech_recognition as sr
 from bs4 import BeautifulSoup
 from nltk.sentiment import SentimentIntensityAnalyzer
-import pathlib
-import textwrap
 import google.generativeai as genai
 
 
@@ -47,7 +46,7 @@ def cypher():
             command = recognizer.recognize_google(audio).lower()
             # Wake up cypher
             now = datetime.datetime.now()
-            if "cypher" in command:
+            if "water" in command:
                 # Greet the user based on the time of day
                 if now.hour < 12:
                    speak("Good morning sir")
@@ -104,6 +103,12 @@ def cypher():
                 speak("Initiating System Restart.")
                 print("Initiating System Restart.")
                 os.system("shutdown /r /t 1")
+
+            # Virus Scan
+            elif "scan Downloads" in command:
+                speak("Scanning Downloads folder for viruses.")
+                print("Scanning Downloads folder for viruses.")
+                scan("C:\\Users\\singh\\Downloads")
 
             # Get the current time
             elif "what time is it" in command or "What is the time" in command:
@@ -204,11 +209,7 @@ def cypher():
                 search_results = google_search(question)
                 speak(search_results)
                 print(search_results)
-                speak("Should i open it in browser")
-                print("Should i open it in browser")
-                answer = listen()
-                print(f"you said:- {answer}")
-                open_browser(answer, command)
+
 
 
         except sr.UnknownValueError:
@@ -230,13 +231,14 @@ def open_browser_in_background(url):
 def speak(text):
     engine = pyttsx3.init()
     voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[0].id)
+    engine.setProperty('voice', voices[1].id)
     engine.setProperty('rate', 200)
     engine.setProperty('volume', 1)
     engine.say(text)
     engine.runAndWait()
 
 def listen():
+    global text
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening...")
@@ -253,23 +255,22 @@ def listen():
 
     return text
 
-
-def open_browser(answer, command):
-    if "yes" in answer or "yeah" in answer or "sure" in answer:
-       speak("Opening in browser")
-       google(command)
-
-    elif "no" in answer or "nope" in answer or "let it be" in answer:
-        speak("thank you sir")
-        cypher()
-
-    else:
-        print("error...")
-        cypher()
-
 def google(link):
     webbrowser.open(f"https://www.google.com/search?q={link}")
     cypher()
+
+def scan(path):
+    if not os.path.exists(path) or not os.path.isdir(path):
+        logging.error(f"Directory '{path}' not found or is not a directory.")
+        return
+
+    try:
+        for root, _, files in os.walk(path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                os.system(f"clamscan {file_path}")
+    except Exception as e:
+        logging.error(f"Error executing 'clamscan' on '{file_path}': {str(e)}")
 
 
 def pro():
@@ -297,8 +298,7 @@ def pro():
             print("Sorry, But can you please repeat?")
             gemini()
 
-if __name__ == "__main__":
-  cypher()
+if __name__ == '__main__':
+    cypher()
 
 
-  
