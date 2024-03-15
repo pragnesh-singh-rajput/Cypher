@@ -11,10 +11,10 @@ import subprocess
 import speech_recognition as sr
 from bs4 import BeautifulSoup
 from nltk.sentiment import SentimentIntensityAnalyzer
+from functools import cache
 import google.generativeai as genai
-
-
 nltk.download('vader_lexicon')
+@cache
 
 def cypher():
     # Set up text-to-speech engine
@@ -31,6 +31,7 @@ def cypher():
     genai.configure(api_key="AIzaSyA9yndda2EQh122n1TR4vr2K1fA8WPkbFc")
     model = genai.GenerativeModel('gemini-pro')
 
+
     # Enter standby mode
     standby = True
 
@@ -40,23 +41,22 @@ def cypher():
             print("Listening...")
             recognizer.adjust_for_ambient_noise(source)
             audio = recognizer.listen(source)
-
         try:
             # Convert speech to text
             command = recognizer.recognize_google(audio).lower()
             # Wake up cypher
             now = datetime.datetime.now()
-            if "water" in command:
+            if "tomato" in command:
                 # Greet the user based on the time of day
                 if now.hour < 12:
-                   speak("Good morning sir")
-                   print("Good morning sir")
+                    speak("Good morning sir")
+                    print("Good morning sir")
                 elif now.hour < 18:
-                   speak("Good afternoon sir")
-                   print("Good afternoon sir")
+                    speak("Good afternoon sir")
+                    print("Good afternoon sir")
                 else:
-                   speak("Good evening sir")
-                   print("Good evening sir")
+                    speak("Good evening sir")
+                    print("Good evening sir")
                 standby = False
 
         except sr.UnknownValueError:
@@ -87,7 +87,7 @@ def cypher():
                     print("cypher Ai assistant system shutdown.")
 
             # StandBy mode
-            elif "thank you cypher" in command or "thank you" in command:
+            elif "thank you tomato" in command or "thank you" in command:
                 speak("You're welcome, sir.")
                 print("You're welcome, sir.")
                 cypher()
@@ -104,11 +104,22 @@ def cypher():
                 print("Initiating System Restart.")
                 os.system("shutdown /r /t 1")
 
+            # code generation
+            elif "write a code" in command or "code for" in command or "code" in command:
+                print("generating code./.")
+                speak("generating code")
+                chat = model.start_chat(history=[])
+                response = chat.send_message(f"{command}")
+                print(response.text)
+                cmd = chat.send_message("Explain the above code.")
+                print(cmd.text)
+                speak(cmd.text)
+
             # Virus Scan
-            elif "scan Downloads" in command:
+            elif "scan downloads" in command:
                 speak("Scanning Downloads folder for viruses.")
                 print("Scanning Downloads folder for viruses.")
-                scan("C:\\Users\\singh\\Downloads")
+                scan("Downloads")
 
             # Get the current time
             elif "what time is it" in command or "What is the time" in command:
@@ -135,7 +146,7 @@ def cypher():
                 print("Let me look that up for you.")
                 question = command
                 search_results = google_search(question)
-                #webbrowser.open(f"https://www.google.com/search?q={question}")
+                # webbrowser.open(f"https://www.google.com/search?q={question}")
                 speak(search_results)
                 print(search_results)
 
@@ -145,7 +156,7 @@ def cypher():
                 print("Opening youtube")
                 webbrowser.open(f"https://www.youtube.com/")
 
-             # Search YouTube
+            # Search YouTube
             elif "search on youtube for" in command:
                 query = command.replace("search on youtube for", "")
                 speak(f"Searching for {query} on Youtube.")
@@ -153,30 +164,33 @@ def cypher():
                 search_url = "https://www.youtube.com/results?search_query=" + query
                 webbrowser.open(search_url)
 
-             # Open Bard
+            # Open Bard
             elif "open google ai" in command or "open bard" in command:
                 speak("Opening Bard")
                 print("Opening Bard")
                 webbrowser.open(f"https://bard.google.com/chat")
 
-             # Open ChatGpt
+            # Open ChatGpt
             elif "open chat gpt" in command:
                 speak("Opening ChatGpt")
                 print("Opening ChatGpt")
                 webbrowser.open(f"https://chat.openai.com/")
 
             # Open Apps
-            elif "open" in command:
+            elif "go dark" in command:
                 text = command.replace("open", "")
                 speak(f"Opening {text}")
                 print(f"Opening {text}")
-                run = (f"C:\\Users\\singh\\Desktop\\cypher\\apps\\{text}.exe")
+                run = f"C:\\Users\\vjjos\\tomato\\apps\\{text}.exe"
                 subprocess.run(run)
 
             # Dev Info
             elif "who made you" in command or "who is your owner" in command or "who is your developer" in command or "who is your dev" in command:
                 speak("sir PragneshKumar Singh also known as Maximus")
                 print("sir PragneshKumar Singh a.k.a Maximus")
+
+
+
 
             # Analyze sentiment of a topic
             elif "what do people think about" in command:
@@ -215,6 +229,7 @@ def cypher():
         except sr.UnknownValueError:
             print("Sorry, But can you please repeat?")
 
+
 def google_search(query):
     url = f"https://www.google.com/search?q={query}"
     response = requests.get(url)
@@ -228,14 +243,16 @@ def open_browser_in_background(url):
     t.daemon = True
     t.start()
 
+
 def speak(text):
     engine = pyttsx3.init()
     voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[1].id)
+    engine.setProperty('voice', voices[0].id)
     engine.setProperty('rate', 200)
     engine.setProperty('volume', 1)
     engine.say(text)
     engine.runAndWait()
+
 
 def listen():
     global text
@@ -255,9 +272,11 @@ def listen():
 
     return text
 
+
 def google(link):
     webbrowser.open(f"https://www.google.com/search?q={link}")
     cypher()
+
 
 def scan(path):
     if not os.path.exists(path) or not os.path.isdir(path):
@@ -277,7 +296,7 @@ def pro():
     genai.configure(api_key="AIzaSyA9yndda2EQh122n1TR4vr2K1fA8WPkbFc")
     model = genai.GenerativeModel('gemini-pro')
     chat = model.start_chat(history=[])
-    chat
+
     def gemini():
         recognizer = sr.Recognizer()
         with sr.Microphone() as source:
@@ -298,7 +317,6 @@ def pro():
             print("Sorry, But can you please repeat?")
             gemini()
 
+
 if __name__ == '__main__':
     cypher()
-
-
