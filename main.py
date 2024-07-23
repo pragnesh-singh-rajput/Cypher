@@ -25,10 +25,10 @@ def cypher():
     recognizer = sr.Recognizer()
 
     # Set up OpenAI API
-    openai.api_key = "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"
+    openai.api_key = ""
 
     # Set up GeminiApi
-    genai.configure(api_key="AIzaSyA9yndda2EQh122n1TR4vr2K1fA8WPkbFc")
+    genai.configure(api_key="")
     model = genai.GenerativeModel('gemini-pro')
 
 
